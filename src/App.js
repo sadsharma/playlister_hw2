@@ -235,6 +235,18 @@ class App extends React.Component {
         let transaction = new MoveSong_Transaction(this, start, end);
         this.tps.addTransaction(transaction);
     }
+
+    addSong = () => {
+        let song = {
+                    "title": "Untitled",
+                    "artist": "Unknown",
+                    "youTubeId": "dQw4w9WgXcQ"
+        }
+        
+        let list = this.state.currentList;
+        list.songs[list.songs.length] = song;
+        this.setStateWithUpdatedList(list);
+    }
     // THIS FUNCTION BEGINS THE PROCESS OF PERFORMING AN UNDO
     undo = () => {
         if (this.tps.hasTransactionToUndo()) {
@@ -296,7 +308,8 @@ class App extends React.Component {
                     canAddSong={canAddSong}
                     canUndo={canUndo}
                     canRedo={canRedo}
-                    canClose={canClose} 
+                    canClose={canClose}
+                    addSongCallback={this.addSong} 
                     undoCallback={this.undo}
                     redoCallback={this.redo}
                     closeCallback={this.closeCurrentList}
