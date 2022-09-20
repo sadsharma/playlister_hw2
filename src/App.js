@@ -7,6 +7,7 @@ import jsTPS from './common/jsTPS.js';
 
 // OUR TRANSACTIONS
 import MoveSong_Transaction from './transactions/MoveSong_Transaction.js';
+import AddSong_Transaction from './transactions/AddSong_Transaction.js';
 
 // THESE REACT COMPONENTS ARE MODALS
 import DeleteListModal from './components/DeleteListModal.js';
@@ -236,15 +237,29 @@ class App extends React.Component {
         this.tps.addTransaction(transaction);
     }
 
-    addSong = () => {
+    addAddSongTransaction = () => {
         let song = {
-                    "title": "Untitled",
-                    "artist": "Unknown",
-                    "youTubeId": "dQw4w9WgXcQ"
+            "title": "Untitled",
+            "artist": "Unknown",
+            "youTubeId": "dQw4w9WgXcQ"
         }
-        
+        let transaction = new AddSong_Transaction(this, song);
+        this.tps.addTransaction(transaction);
+    }
+
+    addSong = (song) => {
         let list = this.state.currentList;
         list.songs[list.songs.length] = song;
+        this.setStateWithUpdatedList(list);
+    }
+
+    removeSong = (index) => {
+        let list = this.state.currentList;
+        for(let i = index; i < list.songs.length; i++)
+        {
+            list.songs[i] = list.songs[i+1];
+        }
+        list.songs.length = list.songs.length - 1;
         this.setStateWithUpdatedList(list);
     }
     // THIS FUNCTION BEGINS THE PROCESS OF PERFORMING AN UNDO
@@ -309,7 +324,7 @@ class App extends React.Component {
                     canUndo={canUndo}
                     canRedo={canRedo}
                     canClose={canClose}
-                    addSongCallback={this.addSong} 
+                    addSongCallback={this.addAddSongTransaction} 
                     undoCallback={this.undo}
                     redoCallback={this.redo}
                     closeCallback={this.closeCurrentList}
