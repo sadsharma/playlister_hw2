@@ -77,7 +77,8 @@ export default class SongCard extends React.Component {
                 onDrop={this.handleDrop}
                 draggable="true"
             >
-                {song.title} by {song.artist}
+                <div> {num}. </div>
+                <div> {song.title} by {song.artist}</div>
             </div>
         )
     }
