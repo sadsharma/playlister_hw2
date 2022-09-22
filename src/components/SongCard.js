@@ -54,12 +54,17 @@ export default class SongCard extends React.Component {
         this.props.moveCallback(sourceId, targetId);
     }
 
+    handleDeleteSong = () => {
+        this.props.deleteCallback();
+
+    }
+
     getItemNum = () => {
         return this.props.id.substring("playlist-song-".length);
     }
 
     render() {
-        const { song } = this.props;
+        const {song} = this.props;
         let num = this.getItemNum();
         console.log("num: " + num);
         let itemClass = "playlister-song";
@@ -80,12 +85,12 @@ export default class SongCard extends React.Component {
                 draggable="true"
             >
                 <span> {num}. </span>
-                <a href= {link} target="_blank" rel="noopener noreferrer">{song.title} by {song.artist}</a>
+                <a href= {link} id={'song' + num} target="_blank" rel="noopener noreferrer" >{song.title} by {song.artist}</a>
                 <input
                         type="button"
                         id={"delete-song-" + num}
                         className="delete-song-button"
-                        onClick={this.num}
+                        onClick={this.handleDeleteSong}
                         value="&#x2715;" />
             </div>
         )
