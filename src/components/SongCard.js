@@ -57,7 +57,7 @@ export default class SongCard extends React.Component {
     }
 
     handleDeleteSong = () => {
-        this.props.deleteCallback(this.getItemNum(), this.songTitle);
+        this.props.deleteCallback(this.getItemNum(), this.state.songTitle);
 
     }
 
@@ -73,6 +73,7 @@ export default class SongCard extends React.Component {
         const {song} = this.props;
         let num = this.getItemNum();
         this.state.songTitle = song.title;
+        console.log(this.state.songTitle);
         console.log("num: " + num);
         let itemClass = "playlister-song";
         const link = "https://www.youtube.com/watch?v=" + song.youTubeId

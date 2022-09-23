@@ -50,6 +50,7 @@ class App extends React.Component {
             nameOfSongToDelete: null,
             sessionData : loadedSessionData
         }
+
     }
     sortKeyNamePairsByName = (keyNamePairs) => {
         keyNamePairs.sort((keyPair1, keyPair2) => {
@@ -311,7 +312,7 @@ class App extends React.Component {
     }
 
     deleteSong = (num, songTitle) => {
-        console.log("beginning of delete song" + num);
+        console.log("beginning of delete song" + songTitle);
         this.setState(prevState => ({
             currentList: prevState.currentList,
             listKeyPairMarkedForDeletion : null,
@@ -390,6 +391,8 @@ class App extends React.Component {
         let modal = document.getElementById("edit-song-modal");
         modal.classList.remove("is-visible");
     }
+
+
     render() {
         let canAddSong = this.state.currentList !== null;
         let canUndo = this.tps.hasTransactionToUndo();

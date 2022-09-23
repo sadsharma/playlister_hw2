@@ -15,7 +15,7 @@ export default class DeleteSongModal extends Component {
                         </div>
                         <div className="modal-center">
                             <div className="modal-center-content">
-                                Are you sure you wish to permanently delete {songName}?
+                                Are you sure you wish to delete {songName}?
                             </div>
                         </div>
                         <div className="modal-south">

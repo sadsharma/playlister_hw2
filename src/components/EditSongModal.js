@@ -14,11 +14,11 @@ export default class EditSongModal extends Component {
                         </div>
                         <div className="modal-center">
                             <div className="modal-center-content">
-                            <span>Song name:</span>
+                            <div>Song name:</div>
                             <input type="text" id="title" name="title"></input>
-                            <span>Artist name:</span>
+                            <div>Artist name:</div>
                             <input type="text" id="artist" name="artist"></input>
-                            <span>Youtube ID:</span>
+                            <div>Youtube ID:</div>
                             <input type="text" id="youTubeId" name ="youtubeID"></input>
                             </div>
                         </div>
