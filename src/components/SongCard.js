@@ -62,7 +62,7 @@ export default class SongCard extends React.Component {
     }
 
     handleEditSong = () => {
-        this.props.editSongCallback();
+        this.props.editSongCallback(this.getItemNum());
     }
 
     getItemNum = () => {

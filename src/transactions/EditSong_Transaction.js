@@ -9,7 +9,7 @@ import jsTPS_Transaction from "../common/jsTPS.js"
  * @author ?
  */
 export default class EditSong_Transaction extends jsTPS_Transaction {
-    constructor(initApp, oldName, oldArtist, oldYoutubeID, newName, newArtist, newYoutubeId ) {
+    constructor(initApp, index, oldName, oldArtist, oldYoutubeID, newName, newArtist, newYoutubeId ) {
         super();
         this.app = initApp;
         this.oldName = oldName;
@@ -18,13 +18,14 @@ export default class EditSong_Transaction extends jsTPS_Transaction {
         this.newArtist = newArtist;
         this.newName = newName;
         this.newYoutubeId = newYoutubeId;
+        this.index = index;
     }
 
     doTransaction() {
-        this.app.moveSong(this.oldSongIndex, this.newSongIndex);
+        this.app.completeEditingSong(this.index, this.newName, this.newArtist, this.newYoutubeId);
     }
     
     undoTransaction() {
-        this.app.moveSong(this.newSongIndex, this.oldSongIndex);
+        this.app.completeEditingSong(this.index, this.oldName, this.oldArtist, this.oldYoutubeID);
     }
 }

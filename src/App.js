@@ -9,11 +9,12 @@ import jsTPS from './common/jsTPS.js';
 import MoveSong_Transaction from './transactions/MoveSong_Transaction.js';
 import AddSong_Transaction from './transactions/AddSong_Transaction.js';
 import RemoveSong_Transaction from './transactions/RemoveSong_Transaction.js';
+import EditSong_Transaction from './transactions/EditSong_Transaction.js';
 
 // THESE REACT COMPONENTS ARE MODALS
 import DeleteListModal from './components/DeleteListModal.js';
 import DeleteSongModal from './components/DeleteSongModal.js';
-import EditSongModal from './components/DeleteSongModal.js';
+import EditSongModal from './components/EditSongModal.js';
 
 // THESE REACT COMPONENTS ARE IN OUR UI
 import Banner from './components/Banner.js';
@@ -35,6 +36,11 @@ class App extends React.Component {
 
         // GET THE SESSION DATA FROM OUR DATA MANAGER
         let loadedSessionData = this.db.queryGetSessionData();
+
+        this.oldTitle = null;
+        this.oldArtist = null;
+        this.oldYoutubeId = null;
+        this.songToEdit = null;
 
         // SETUP THE INITIAL STATE
         this.state = {
@@ -257,6 +263,39 @@ class App extends React.Component {
         this.tps.addTransaction(transaction);
     }
 
+    addEditSongTransaction = () => {
+        let title = document.getElementById("title");
+        let artist = document.getElementById("artist");
+        let youtubeID = document.getElementById("youTubeId");
+        let transaction = new EditSong_Transaction(this, this.songToEdit, this.oldTitle, this.oldArtist, this.oldYoutubeId, title.value, artist.value, youtubeID.value);
+        this.tps.addTransaction(transaction);
+
+    }
+
+    getOldValuesBeforeEdit = (number) => {
+        this.showEditSongModal();
+        let list = this.state.currentList;
+        let title = document.getElementById("title");
+        title.value = list.songs[number - 1].title;
+        let artist = document.getElementById("artist");
+        artist.value = list.songs[number - 1].artist;
+        let youtubeID = document.getElementById("youTubeId");
+        youtubeID.value = list.songs[number - 1].youTubeId;
+
+        this.oldTitle = title.value;
+        this.oldArtist = artist.value;
+        this.oldYoutubeId = youtubeID.value;
+        this.songToEdit = number - 1;
+    }
+
+    completeEditingSong = (index, newTitle, newArtist, newYoutubeId) => {
+        let list = this.state.currentList;
+        list.songs[index].title = newTitle;
+        list.songs[index].artist = newArtist;
+        list.songs[index].youTubeId = newYoutubeId;
+        this.hideEditSongModal();
+        this.setStateWithUpdatedList(list);
+    }
     addSong = (song) => {
         let list = this.state.currentList;
         list.songs[list.songs.length] = song;
@@ -341,7 +380,7 @@ class App extends React.Component {
         let modal = document.getElementById("delete-song-modal");
         modal.classList.remove("is-visible");
     }
-    
+
     showEditSongModal() {
         let modal = document.getElementById("edit-song-modal");
         modal.classList.add("is-visible");
@@ -384,7 +423,7 @@ class App extends React.Component {
                     moveSongCallback={this.addMoveSongTransaction} 
                     deleteSongCallback={this.deleteSong}
                     hideDeleteSongModalCallback={this.hideDeleteSongModal}
-                    editSongCallback={this.showEditSongModal}
+                    editSongCallback={this.getOldValuesBeforeEdit}
                     hideEditSongModalCallback={this.hideEditSongModal}
                     />
                 <Statusbar 
@@ -400,7 +439,7 @@ class App extends React.Component {
                     hideDeleteSongModalCallback={this.hideDeleteSongModal}
                 />
                 <EditSongModal
-                    editSongCallback={this.showEditSongModal}
+                    editSongCallback={this.addEditSongTransaction}
                     hideEditSongModalCallback={this.hideEditSongModal}
                 />
             </div>
