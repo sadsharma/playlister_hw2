@@ -61,6 +61,10 @@ export default class SongCard extends React.Component {
 
     }
 
+    handleEditSong = () => {
+        this.props.editSongCallback();
+    }
+
     getItemNum = () => {
         return this.props.id.substring("playlist-song-".length);
     }
@@ -84,6 +88,7 @@ export default class SongCard extends React.Component {
                 onDragEnter={this.handleDragEnter}
                 onDragLeave={this.handleDragLeave}
                 onDrop={this.handleDrop}
+                onDoubleClick={this.handleEditSong}
                 draggable="true"
             >
                 <span> {num}. </span>

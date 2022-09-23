@@ -13,6 +13,7 @@ import RemoveSong_Transaction from './transactions/RemoveSong_Transaction.js';
 // THESE REACT COMPONENTS ARE MODALS
 import DeleteListModal from './components/DeleteListModal.js';
 import DeleteSongModal from './components/DeleteSongModal.js';
+import EditSongModal from './components/DeleteSongModal.js';
 
 // THESE REACT COMPONENTS ARE IN OUR UI
 import Banner from './components/Banner.js';
@@ -340,6 +341,16 @@ class App extends React.Component {
         let modal = document.getElementById("delete-song-modal");
         modal.classList.remove("is-visible");
     }
+    
+    showEditSongModal() {
+        let modal = document.getElementById("edit-song-modal");
+        modal.classList.add("is-visible");
+    }
+    // THIS FUNCTION IS FOR HIDING THE MODAL
+    hideEditSongModal() {
+        let modal = document.getElementById("edit-song-modal");
+        modal.classList.remove("is-visible");
+    }
     render() {
         let canAddSong = this.state.currentList !== null;
         let canUndo = this.tps.hasTransactionToUndo();
@@ -373,6 +384,8 @@ class App extends React.Component {
                     moveSongCallback={this.addMoveSongTransaction} 
                     deleteSongCallback={this.deleteSong}
                     hideDeleteSongModalCallback={this.hideDeleteSongModal}
+                    editSongCallback={this.showEditSongModal}
+                    hideEditSongModalCallback={this.hideEditSongModal}
                     />
                 <Statusbar 
                     currentList={this.state.currentList} />
@@ -385,6 +398,10 @@ class App extends React.Component {
                     name={this.state.nameOfSongToDelete}
                     deleteSongCallback={this.addRemoveSongTransaction}
                     hideDeleteSongModalCallback={this.hideDeleteSongModal}
+                />
+                <EditSongModal
+                    editSongCallback={this.showEditSongModal}
+                    hideEditSongModalCallback={this.hideEditSongModal}
                 />
             </div>
         );
