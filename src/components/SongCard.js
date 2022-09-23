@@ -6,7 +6,9 @@ export default class SongCard extends React.Component {
 
         this.state = {
             isDragging: false,
-            draggedTo: false
+            draggedTo: false,
+            number : null,
+            songTitle: null
         }
     }
     handleDragStart = (event) => {
@@ -55,7 +57,7 @@ export default class SongCard extends React.Component {
     }
 
     handleDeleteSong = () => {
-        this.props.deleteCallback();
+        this.props.deleteCallback(this.getItemNum(), this.songTitle);
 
     }
 
@@ -66,6 +68,7 @@ export default class SongCard extends React.Component {
     render() {
         const {song} = this.props;
         let num = this.getItemNum();
+        this.state.songTitle = song.title;
         console.log("num: " + num);
         let itemClass = "playlister-song";
         const link = "https://www.youtube.com/watch?v=" + song.youTubeId
@@ -73,7 +76,6 @@ export default class SongCard extends React.Component {
             itemClass = "playlister-song-dragged-to";
         }
         return (
-
             <div
                 id={'song-' + num}
                 className={itemClass}
