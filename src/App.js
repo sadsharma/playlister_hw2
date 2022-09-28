@@ -48,7 +48,8 @@ class App extends React.Component {
             currentList : null,
             numberOfSongToDelete : null,
             nameOfSongToDelete: null,
-            sessionData : loadedSessionData
+            sessionData : loadedSessionData,
+            modalOpen : false
         }
 
     }
@@ -132,6 +133,8 @@ class App extends React.Component {
             // DELETING THE LIST FROM PERMANENT STORAGE
             // IS AN AFTER EFFECT
             this.db.mutationDeleteList(key);
+            this.tps.clearAllTransactions();
+            this.closeModalEnableButtons();
 
             // SO IS STORING OUR SESSION DATA
             this.db.mutationUpdateSessionData(this.state.sessionData);
@@ -182,6 +185,7 @@ class App extends React.Component {
     }
     // THIS FUNCTION BEGINS THE PROCESS OF LOADING A LIST FOR EDITING
     loadList = (key) => {
+        this.tps.clearAllTransactions();
         let newCurrentList = this.db.queryGetList(key);
         this.setState(prevState => ({
             listKeyPairMarkedForDeletion : prevState.listKeyPairMarkedForDeletion,
@@ -190,7 +194,6 @@ class App extends React.Component {
         }), () => {
             // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
             // THE TRANSACTION STACK IS CLEARED
-            this.tps.clearAllTransactions();
         });
     }
     // THIS FUNCTION BEGINS THE PROCESS OF CLOSING THE CURRENT LIST
@@ -203,6 +206,7 @@ class App extends React.Component {
             // AN AFTER EFFECT IS THAT WE NEED TO MAKE SURE
             // THE TRANSACTION STACK IS CLEARED
             this.tps.clearAllTransactions();
+            this.updateButtons();
         });
     }
     setStateWithUpdatedList(list) {
@@ -250,13 +254,16 @@ class App extends React.Component {
     }
 
     addAddSongTransaction = () => {
-        let song = {
-            "title": "Untitled",
-            "artist": "Unknown",
-            "youTubeId": "dQw4w9WgXcQ"
+        if(this.state.currentList !== null)
+        {
+            let song = {
+                "title": "Untitled",
+                "artist": "Unknown",
+                "youTubeId": "dQw4w9WgXcQ"
+            }
+            let transaction = new AddSong_Transaction(this, song);
+            this.tps.addTransaction(transaction);
         }
-        let transaction = new AddSong_Transaction(this, song);
-        this.tps.addTransaction(transaction);
     }
 
     addRemoveSongTransaction = () => {
@@ -339,6 +346,7 @@ class App extends React.Component {
 
             // MAKE SURE THE LIST GETS PERMANENTLY UPDATED
             this.db.mutationUpdateList(this.state.currentList);
+            this.closeModalEnableButtons();
         }
     }
     // THIS FUNCTION BEGINS THE PROCESS OF PERFORMING A REDO
@@ -348,6 +356,7 @@ class App extends React.Component {
 
             // MAKE SURE THE LIST GETS PERMANENTLY UPDATED
             this.db.mutationUpdateList(this.state.currentList);
+            this.closeModalEnableButtons();
         }
     }
     markListForDeletion = (keyPair) => {
@@ -362,42 +371,167 @@ class App extends React.Component {
     }
     // THIS FUNCTION SHOWS THE MODAL FOR PROMPTING THE USER
     // TO SEE IF THEY REALLY WANT TO DELETE THE LIST
-    showDeleteListModal() {
+    showDeleteListModal = () => {
         let modal = document.getElementById("delete-list-modal");
         modal.classList.add("is-visible");
+        this.setState(prevState => ({
+            modalOpen : true
+        }), () => {
+            this.openModalDisableButtons();
+        });
+        //this.openModalDisableButtons();
     }
     // THIS FUNCTION IS FOR HIDING THE MODAL
-    hideDeleteListModal() {
+    hideDeleteListModal = () => {
         let modal = document.getElementById("delete-list-modal");
         modal.classList.remove("is-visible");
+        this.setState(prevState => ({
+            modalOpen : false
+        }), () => {
+            this.closeModalEnableButtons();
+        });
     }
 
-    showDeleteSongModal() {
+    showDeleteSongModal = () => {
         let modal = document.getElementById("delete-song-modal");
         modal.classList.add("is-visible");
+        this.setState(prevState => ({
+            modalOpen : false
+        }), () => {
+            this.openModalDisableButtons();
+        });
     }
     // THIS FUNCTION IS FOR HIDING THE MODAL
-    hideDeleteSongModal() {
+    hideDeleteSongModal = () => {
         let modal = document.getElementById("delete-song-modal");
         modal.classList.remove("is-visible");
+        this.setState(prevState => ({
+            modalOpen : false
+        }), () => {
+            this.closeModalEnableButtons();
+        });
     }
 
-    showEditSongModal() {
+    showEditSongModal = () => {
         let modal = document.getElementById("edit-song-modal");
+        
         modal.classList.add("is-visible");
+        this.setState(prevState => ({
+            modalOpen : false
+        }), () => {
+            this.openModalDisableButtons();
+        });
     }
     // THIS FUNCTION IS FOR HIDING THE MODAL
-    hideEditSongModal() {
+    hideEditSongModal = () => {
         let modal = document.getElementById("edit-song-modal");
         modal.classList.remove("is-visible");
+        this.setState(prevState => ({
+            modalOpen : false
+        }), () => {
+            this.closeModalEnableButtons();
+        });
+    }
+
+    handleKeyDown = (event) =>
+    {
+        if(event.ctrlKey) {
+            if(event.keyCode === 90)
+            {
+                if( this.tps.hasTransactionToUndo())
+                {
+                    this.undo();
+                }
+                event.preventDefault();
+            }
+
+            else if(event.keyCode === 89)
+            {
+                if(this.tps.hasTransactionToRedo())
+                {
+                    this.redo();
+                }
+            }
+        }
+    }
+
+    componentDidMount = () =>
+    {
+        document.addEventListener("keydown", this.handleKeyDown);
+    }
+
+    openModalDisableButtons = () => {
+        this.disableButton("undo-button");
+        this.disableButton("redo-button");
+        this.disableButton("close-button");
+        this.disableButton("add-song-button");
+        this.disableButton("add-list-button");
+    }
+
+    updateButtons = () => {
+        this.disableButton("undo-button");
+        this.disableButton("redo-button");
+        this.disableButton("close-button");
+        this.disableButton("add-song-button");
+    }
+
+    closeModalEnableButtons = () => {
+        if(this.tps.hasTransactionToUndo())
+        {
+            this.enableButton("undo-button");
+        }
+        else
+        {
+            this.disableButton("undo-button");
+        }
+        if(this.tps.hasTransactionToRedo())
+        {
+            this.enableButton("redo-button");
+        }
+        else 
+        {
+            this.disableButton("redo-button");
+        }
+        if(this.state.currentList !== null)
+        {
+            this.enableButton("add-song-button");
+        }
+        else 
+        {
+            this.disableButton("add-song-button");
+        }
+        if(this.state.currentList !== null)
+        {
+            this.enableButton("close-button");
+        }
+        else 
+        {
+            this.disableButton("close-button");
+        }
+        this.enableButton("add-list-button");
+
     }
 
 
+    disableButton = (id) => {
+        let button = document.getElementById(id);
+        button.classList.add("disabled");
+        button.disabled = true;
+    }
+
+    enableButton = (id) => {
+        let button = document.getElementById(id);
+        button.classList.remove("disabled");
+        button.disabled = false;
+    } 
+
+    
     render() {
         let canAddSong = this.state.currentList !== null;
         let canUndo = this.tps.hasTransactionToUndo();
         let canRedo = this.tps.hasTransactionToRedo();
         let canClose = this.state.currentList !== null;
+
         return (
             <div id="root-inner">
                 <Banner />
@@ -420,6 +554,7 @@ class App extends React.Component {
                     undoCallback={this.undo}
                     redoCallback={this.redo}
                     closeCallback={this.closeCurrentList}
+                    disable = {this.disableButton}
                 />
                 <PlaylistCards
                     currentList={this.state.currentList}
