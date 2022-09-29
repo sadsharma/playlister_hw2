@@ -396,7 +396,7 @@ class App extends React.Component {
         let modal = document.getElementById("delete-song-modal");
         modal.classList.add("is-visible");
         this.setState(prevState => ({
-            modalOpen : false
+            modalOpen : true
         }), () => {
             this.openModalDisableButtons();
         });
@@ -417,7 +417,7 @@ class App extends React.Component {
         
         modal.classList.add("is-visible");
         this.setState(prevState => ({
-            modalOpen : false
+            modalOpen : true
         }), () => {
             this.openModalDisableButtons();
         });
@@ -435,24 +435,30 @@ class App extends React.Component {
 
     handleKeyDown = (event) =>
     {
-        if(event.ctrlKey) {
-            if(event.keyCode === 90)
-            {
-                if( this.tps.hasTransactionToUndo())
+            if(event.ctrlKey) {
+                if(event.keyCode === 90)
                 {
-                    this.undo();
+                    if( this.tps.hasTransactionToUndo())
+                    {
+                        if(!this.state.modalOpen)
+                        {
+                            this.undo();
+                        }
+                    }
+                    event.preventDefault();
                 }
-                event.preventDefault();
-            }
 
-            else if(event.keyCode === 89)
-            {
-                if(this.tps.hasTransactionToRedo())
+                else if(event.keyCode === 89)
                 {
-                    this.redo();
+                    if(this.tps.hasTransactionToRedo())
+                    {
+                        if(!this.state.modalOpen)
+                        {
+                            this.redo();
+                        }
+                    }
                 }
             }
-        }
     }
 
     componentDidMount = () =>
